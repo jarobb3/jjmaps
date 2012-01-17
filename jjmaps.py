@@ -119,7 +119,6 @@ class ChaptersUpdate(webapp2.RequestHandler):
                 return
             
             chapter.countyinds.append(ind+'|'+s)
-            #chapter.countyinds.append(s+"|"+ind)
             
         zipindexdata = {}
         chapter.zipinds = []
