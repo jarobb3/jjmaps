@@ -31,10 +31,9 @@ def findzipindicies(dataarr,ziplist):
         try:
             found = dataarr.index([z])
             index = dataarr[found-1][0]
+            inds.append(index)
         except ValueError:
             return { 'error' : 'Zipcode Not Found', 'baditem' : z }
-            
-        inds.append(index)
         
     return inds
 

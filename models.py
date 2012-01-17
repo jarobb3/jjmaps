@@ -2,7 +2,7 @@ from google.appengine.ext import db
     
 class Chapter(db.Model):
     name = db.StringProperty()
-    state = db.ListProperty(str)
+    state = db.StringProperty()
     zips = db.ListProperty(str)
     zipinds = db.ListProperty(str)
     counties = db.ListProperty(str)
