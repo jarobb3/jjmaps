@@ -3,7 +3,7 @@ import os
 import models
 import helpers
 import json
-import pprint
+#import pprint
 
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
@@ -144,7 +144,7 @@ class ChaptersUpdate(webapp2.RequestHandler):
         
     def errorstr(self,errorobj):
         return """
-            Update Error: %s -- %s. Please hit the Back button in your browser, check your spelling, and try again.
+            Update Error: %s -- %s. Please hit the Back button in your browser and try again. Check your spelling and check the state of the invalid zipcode or county.
         """ % (errorobj['error'],"\""+errorobj['baditem']+"\"")
         
 class ChaptersDelete(webapp2.RequestHandler):
