@@ -1,3 +1,15 @@
+def stateforcounty(county,defaultstate):
+    c = county.split("|")
+    if len(c) > 1:
+        return c[1]
+    return defaultstate
+
+def stateforzip(zipcode,defaultstate):
+    z = zipcode.split("|")
+    if len(z) > 1:
+        return z[1]
+    return defaultstate
+
 def genindfilenamearr(states):
     countyfilenamearr = []
     zipfilenamearr = [] 
@@ -12,6 +24,27 @@ def genindfilenamearr(states):
 
 def mapstrip(s): return s.strip()
 def quotekill(s): return s.replace('\"','').split()
+
+def findcountyindex(dataarr,county):
+    c = county.strip().split()
+    try:
+        found = dataarr.index(c)
+        index = dataarr[found-3][0]
+    except ValueError:
+        return{ 'error' : 'County Not Found' , 'baditem' : county}
+        
+    return index
+
+def findzipindex(dataarr,zipcode):
+    z = zipcode.strip().split()
+    try:
+        found = dataarr.index(z)
+        index = dataarr[found-1][0]
+    except ValueError:
+        return { 'error' : 'Zipcode Not Found', 'baditem' : zipcode }
+    
+    return index
+
 def findcountyindicies(dataarr,countylist):
     inds = []
     for c in countylist:
@@ -43,6 +76,14 @@ def getdatafilearray(filename):
     f.close()
     
     return data
+
+def prepindexfile(filename):
+    data = getdatafilearray(filename)
+    return map(quotekill,data)
+
+def prepcoordsfile(filename):
+    data = getdatafilearray(filename)
+    return map(mapkill,data)
 
 def spacekill(s): return s!=''
 def mapkill(line): return filter(spacekill,line.split())

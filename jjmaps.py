@@ -3,7 +3,7 @@ import os
 import models
 import helpers
 import json
-#import pprint
+import pprint
 
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.ext.webapp import template
@@ -32,23 +32,36 @@ class Maps(webapp2.RequestHandler):
         self.response.out.write( json.dumps({ 'chaptername' : chapter.name, 'chapterkey' : chapterkey, 'coords' : c }) )
         
     def coordsfromchapterkey(self,chapter):
-        zipinds = chapter.zipinds
-        countyinds = chapter.countyinds
-        state = chapter.state
+        zipcoordsdata = {}
+        countycoordsdata = {}
         
-        zipsfilearr = map(helpers.mapkill,helpers.getdatafilearray('data/' + state + '/zip/complex.txt'))
-        countysfilearr = map(helpers.mapkill,helpers.getdatafilearray('data/' + state + '/county/complex.txt'))
-                
         c = []
-        for zi in zipinds:
-            coords = helpers.getcoordsfromindex(zipsfilearr,zi)
+        for county in chapter.countyinds:
+            s = helpers.stateforcounty(county,chapter.state)
+            countyind = county.split('|')[0]
+            try:
+                dataarr = countycoordsdata[s]
+                coords = helpers.getcoordsfromindex(dataarr, countyind)
+            except KeyError:
+                countycoordsdata[s] = helpers.prepcoordsfile('data/' + s + '/county/complex.txt')
+                coords = helpers.getcoordsfromindex(countycoordsdata[s], countyind)
+               
             if coords:
                 c.append(map(' '.join,coords))
                 
-        for ci in countyinds:
-            coords = helpers.getcoordsfromindex(countysfilearr, ci)
+        for zipcode in chapter.zipinds:
+            s = helpers.stateforzip(zipcode,chapter.state)
+            zipind = zipcode.split('|')[0]
+            try:
+                dataarr = zipcoordsdata[s]
+                coords = helpers.getcoordsfromindex(dataarr, zipind)
+            except KeyError:
+                zipcoordsdata[s] = helpers.prepcoordsfile('data/' + s + '/zip/complex.txt')
+                coords = helpers.getcoordsfromindex(zipcoordsdata[s], zipind)
+            
             if coords:
                 c.append(map(' '.join,coords))
+        
         return c
         
 class Chapters(webapp2.RequestHandler):
@@ -83,32 +96,47 @@ class ChaptersUpdate(webapp2.RequestHandler):
         chapter.state = self.request.get('chapterstate').upper()
         
         if zips: chapter.zips = map(helpers.mapstrip, zips.split(","))
-        else: chapter.zips = ['Null']
+        else: chapter.zips = []
         
         if counties: chapter.counties = map(helpers.mapstrip, counties.split(","))
-        else: chapter.counties = ['Null']
-            
-        if chapter.counties[0] != 'Null':
-            countydataarr = map(helpers.quotekill,helpers.getdatafilearray('data/' + chapter.state + '/county/simple.txt'))
-            inds = helpers.findcountyindicies(countydataarr, chapter.counties)
-            if not isinstance(inds,list):
-                self.response.out.write(self.errorstr(inds))
-                return
-            chapter.countyinds = inds
-        else:
-            chapter.countyinds = []
+        else: chapter.counties = []
         
-        if chapter.zips[0] != 'Null':
-            zipsdataarr = map(helpers.quotekill,helpers.getdatafilearray('data/' + chapter.state + '/zip/simple.txt'))
-            zinds = helpers.findzipindicies(zipsdataarr, chapter.zips)
-            if not isinstance(zinds,list):
-                self.response.out.write(self.errorstr(zinds))
+        countyindexdata = {}
+        chapter.countyinds = []
+        for county in chapter.counties:
+            s = helpers.stateforcounty(county, chapter.state)
+            try:
+                dataarr = countyindexdata[s]
+                ind = helpers.findcountyindex(dataarr, county)
+            except KeyError:
+                #add dataarr to dict of state data arrays
+                countyindexdata[s] = helpers.prepindexfile('data/' + s + '/county/simple.txt')
+                ind = helpers.findcountyindex(countyindexdata[s], county.split("|")[0])
+            
+            if not isinstance(ind,str):
+                self.response.out.write(self.errorstr(ind))
                 return
-            chapter.zipinds = zinds
-        else:
-            chapter.zipinds = []
-         
-        #print chapter.to_xml()   
+            
+            chapter.countyinds.append(ind+'|'+s)
+            #chapter.countyinds.append(s+"|"+ind)
+            
+        zipindexdata = {}
+        chapter.zipinds = []
+        for zipcode in chapter.zips:
+            s = helpers.stateforzip(zipcode,chapter.state)
+            try:
+                dataarr = zipindexdata[s]
+                ind = helpers.findzipindex(dataarr,zipcode)
+            except KeyError:
+                zipindexdata[s] = helpers.prepindexfile('data/' + s + '/zip/simple.txt')
+                ind = helpers.findzipindex(zipindexdata[s], zipcode.split("|")[0])
+                
+            if not isinstance(ind,str):
+                self.response.out.write(self.errorstr(ind))
+                return
+            
+            chapter.zipinds.append(ind+'|'+s)
+                
         chapter.put()
         
         self.redirect('/chapters')
@@ -164,21 +192,11 @@ class ChaptersCreateAuto(webapp2.RequestHandler):
             
         self.redirect('/chapters')
         
-class test(webapp2.RequestHandler):
-    def get(self):
-        chapters = models.getallchapters()
-
-        template_values = { 'chapters' : chapters }
-        
-        path = os.path.join(os.path.dirname(__file__), 'templates/test.html')
-        self.response.out.write(template.render(path, template_values))
-        
 app = webapp2.WSGIApplication([
                                ('/', Maps),
                                ('/map', Maps),
                                ('/chapters', Chapters),
                                ('/chapters/update',ChaptersUpdate),
-                               ('/test', test),
                                ('/chapters/create/auto', ChaptersCreateAuto),
                                ('/chapters/clear', ChaptersClear),
                                ('/chapters/delete', ChaptersDelete)]
