@@ -105,13 +105,14 @@ class ChaptersUpdate(webapp2.RequestHandler):
         chapter.countyinds = []
         for county in chapter.counties:
             s = helpers.stateforcounty(county, chapter.state)
+            countyname = county.split("|")[0]
             try:
                 dataarr = countyindexdata[s]
-                ind = helpers.findcountyindex(dataarr, county)
+                ind = helpers.findcountyindex(dataarr, countyname)
             except KeyError:
                 #add dataarr to dict of state data arrays
                 countyindexdata[s] = helpers.prepindexfile('data/' + s + '/county/simple.txt')
-                ind = helpers.findcountyindex(countyindexdata[s], county.split("|")[0])
+                ind = helpers.findcountyindex(countyindexdata[s], countyname)
             
             if not isinstance(ind,str):
                 self.response.out.write(self.errorstr(ind))
@@ -124,12 +125,13 @@ class ChaptersUpdate(webapp2.RequestHandler):
         chapter.zipinds = []
         for zipcode in chapter.zips:
             s = helpers.stateforzip(zipcode,chapter.state)
+            zipname = zipcode.split("|")[0]
             try:
                 dataarr = zipindexdata[s]
-                ind = helpers.findzipindex(dataarr,zipcode)
+                ind = helpers.findzipindex(dataarr,zipname)
             except KeyError:
                 zipindexdata[s] = helpers.prepindexfile('data/' + s + '/zip/simple.txt')
-                ind = helpers.findzipindex(zipindexdata[s], zipcode.split("|")[0])
+                ind = helpers.findzipindex(zipindexdata[s], zipname)
                 
             if not isinstance(ind,str):
                 self.response.out.write(self.errorstr(ind))

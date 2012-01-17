@@ -31,6 +31,8 @@ def findcountyindex(dataarr,county):
         found = dataarr.index(c)
         index = dataarr[found-3][0]
     except ValueError:
+        print c
+        print dataarr[24]
         return{ 'error' : 'County Not Found' , 'baditem' : county}
         
     return index
