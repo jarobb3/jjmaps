@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<head>
+	<link type = "text/css" rel="stylesheet" href="../stylesheets/jjstyles.css" ></link>
+</head>
+<body>
+	<h3>
+	{% if chapter %}
+	Update existing chapter{% else %}Create a new chapter
+	{% endif %}
+	</h3>
+	<form action = "/chapters/update" method = "post">
+		<div class = "fl fullw">
+			<label class = 'label norm fl'>Chapter Name</label> 
+			<input type = "text" name = "chaptername" value = "{{chapter.name}}" />
+			<span class = 'ital small lhsmall'>i.e. North Suburban Atlanta</span>
+		</div>
+		<div class = "fl fullw">
+			<label class = 'label norm fl'>State (2-letter abbrevs.)</label> 
+			<input type = "text" name = "chapterstate" size=10 value = "{{chapter.state}}" />
+			<span class = 'ital small lhsmall'>i.e. GA,AL,FL</span>
+		</div>
+		<div class = "fl fullw">
+			<label class = 'fl label norm'>Zipcodes in Chapter (leave blank if none) </label>
+			<textarea name = "chapterzips" rows = "5" cols = "30" />{{chapter.zips|join:', '|cut:"Null"}}</textarea>
+			<span class = 'ital small lhsmall'>i.e. 30068,30327</span>
+		</div>
+		<div class = "fl fullw">
+			<label class = 'fl label norm'>Counties in Chapter (leave blank if none) </label>
+			<textarea name = "chaptercounties" rows = "5" cols = "30" />{{chapter.counties|join:', '|cut:"Null"}}</textarea>
+			<span class = 'ital small lhsmall'>i.e. Cobb, Fulton, Dekalb</span>
+		</div>
+		<div class = "fl fullw">
+			<label class = 'fl label'>&nbsp;</label>
+			{% if chapter %}
+				<input type = "hidden" name = "chapterkey" value = "{{chapter.key}}" />
+				<input type = "submit" value = "Update" />
+			{% else %}
+				<input type = "submit" value = "Create" />
+			{% endif %}
+			<a href = "/chapters">Clear</a>
+		</div>
+	</form>
+	<div style = "clear:left;">
+		{% regroup chapters|dictsort:"state" by state as states %}
+		<ul class = "list plm">
+		{% for state in states %}
+			<li><span class = "bold">{{state.grouper}}</span>
+				<ul class = "list plb">
+					{% for chap in state.list %}
+					<li class = >
+						<span class = 'fl {% if chapter.key == chap.key %}bold highlight ital{% endif %}' style = "width:200px;">{{chap.name}}</span>
+						<a class = 'plm' href = "/map?chapterkey={{chap.key}}">Show on Map</a>
+						<a class = 'plm' href = "/chapters?chapterkey={{chap.key}}">Edit</a>
+						<a class = 'plm' href = "/chapters/delete?chapterkey={{chap.key}}">Delete</a>
+					</li>
+					{% endfor %}
+				</ul>
+			</li>
+		{% endfor %}
+		</ul>
+	</div>
+</body>
+</html>

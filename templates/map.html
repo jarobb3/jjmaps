@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
+	<link type = "text/css" rel="stylesheet" href="../stylesheets/jjstyles.css" ></link>
+	<script type = "text/javascript" src = '../js/ajaxutils.js'></script>
+	<script type = "text/javascript" src = '../js/maputils.js'></script>
+	<script type = "text/javascript" src = '../js/visualutils.js'></script>
+	<script type = "text/javascript">
+		//needs this global var to keep track of which chapters have been added to the map
+		chaptersDisplayed = {};
+		//map object
+		map = "";
+		//helps with keeping track of color to select next
+		numChaptersAdded = 0;
+		
+		function init(){
+			GetMap();
+			var chapterkey = '{{chapter.key|escapejs}}';
+			if( chapterkey != '' ){
+				showChapter(chapterkey);
+			}
+			//want to grab chapterkey to do async post reques to server
+		}
+	</script>
+</head>
+<body onload="init();">
+	<div class = "container">
+		<div class = "fixed" style = "background-color:white;width:300px;top:0px;left:0px">
+			<p style = "margin:2px 5px 0 5px;"><a href = "/chapters">Add/Edit Chapters</a> <a class = "fr" href = "/map">Clear Map</a></p>
+		</div>
+		<div class = "fl" style = "width:280px">
+			{% regroup chapters|dictsort:"state" by state as states %}
+			
+			<ul class = "list plm">
+			{% for state in states %}
+				<li><span class = "bold">{{state.grouper}}</span>
+					<ul class = "list plb">
+						{% for chapter in state.list %}
+						<li>
+							<div class='hidden legend fl' id = "{{chapter.key}}-legend">&nbsp;</div>
+							{{chapter.name}}
+							<span class ="fr">
+							<a class="blue pointer" id = "{{chapter.key}}-display" onclick = "showChapter('{{chapter.key}}')">Show on Map</a>
+							<a class = "red pointer hidden" id = "{{chapter.key}}-remove" onclick = "removeChapter('{{chapter.key}}')">Hide</a>
+							</span>
+						</li>
+						{% endfor %}
+					</ul>
+				</li>
+			{% endfor %}
+			</ul>
+		</div>
+		
+		<div id = 'mapDiv' class = "map"></div>
+	</div>
+	<div class = 'overlay hidden' id = 'overlay'>
+		<div class = 'spinner'><img src = "/img/loading-spinner.gif" /></div>
+	</div>
+</body>
+</html>
