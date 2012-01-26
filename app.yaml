@@ -14,7 +14,7 @@ handlers:
 - url: /img
   static_dir: img
   
-- url: /chapters/.*
+- url: /chapters.*
   script: jjmaps.py
   login: admin
 
