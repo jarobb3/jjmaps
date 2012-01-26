@@ -13,6 +13,10 @@ handlers:
   
 - url: /img
   static_dir: img
+  
+- url: /chapters/.*
+  script: jjmaps.py
+  login: admin
 
 - url: /.*
   script: jjmaps.py

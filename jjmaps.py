@@ -25,12 +25,32 @@ class Maps(webapp2.RequestHandler):
         self.response.out.write(template.render(path, template_values))
         
     def post(self):
-        chapterkey = self.request.get('chapterkey')
-        chapter = models.getchapter(chapterkey)
-        c = self.coordsfromchapterkey(chapter)
+        chapternames = []
+        chapterkeys = []
+        coords = []
         
-        self.response.out.write( json.dumps({ 'chaptername' : chapter.name, 'chapterkey' : chapterkey, 'coords' : c }) )
-        
+        if self.request.get('chapterkey'):
+            chapter = models.getchapter(self.request.get('chapterkey'))
+            
+            chapternames.append(chapter.name)
+            #chapterkeys.append(self.request.get('chapterkey'))
+            chapterkeys.append(str(chapter.key()))
+            coords.append(self.coordsfromchapterkey(chapter))
+    
+        else:
+            #lookup code path
+            #need to be able to support showing multiple chapters in one request, which requires changes to this function and the AJAX JS
+            #also need to support what happens if it's a county instead of a zip being looked up
+            chapters = models.getchapterfromzip(self.request.get('q'))
+            
+            
+            for ch in chapters:
+                chapternames.append(ch.name)
+                chapterkeys.append(str(ch.key()))
+                coords.append(self.coordsfromchapterkey(ch))
+                
+        self.response.out.write( json.dumps({ 'chapternames' : chapternames, 'chapterkeys' : chapterkeys, 'coords' : coords }) )
+                
     def coordsfromchapterkey(self,chapter):
         zipcoordsdata = {}
         countycoordsdata = {}
@@ -193,6 +213,12 @@ class ChaptersCreateAuto(webapp2.RequestHandler):
             
         self.redirect('/chapters')
         
+class Test(webapp2.RequestHandler):
+    def get(self):
+        zipcode = '30327'
+        x = models.getchapterfromzip(zipcode)
+        print x
+        
 app = webapp2.WSGIApplication([
                                ('/', Maps),
                                ('/map', Maps),
@@ -200,7 +226,8 @@ app = webapp2.WSGIApplication([
                                ('/chapters/update',ChaptersUpdate),
                                ('/chapters/create/auto', ChaptersCreateAuto),
                                ('/chapters/clear', ChaptersClear),
-                               ('/chapters/delete', ChaptersDelete)]
+                               ('/chapters/delete', ChaptersDelete),
+                               ('/test', Test)]
                               ,debug=True)
 
 def main():

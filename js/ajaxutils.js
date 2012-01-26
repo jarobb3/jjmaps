@@ -1,3 +1,9 @@
+function lookup(){
+	var q = document.getElementsByName("lookup")[0].value;
+	showOverlay();
+	downloadUrl('/map', "POST", "q="+q, handleResponse);
+}
+
 function showChapter(chapterkey){
 	//if we've already added the chapter to the map and it's just hidden
 	var starti = 0;
@@ -21,10 +27,8 @@ function showChapter(chapterkey){
 	else{
 		showOverlay();
 		
-		hideAction('display',chapterkey);
-		showAction('remove',chapterkey);
-		
-		numChaptersAdded++;
+		//hideAction('display',chapterkey);
+		//showAction('remove',chapterkey);
 		
 		downloadUrl('/map',"POST","chapterkey="+chapterkey,handleResponse);
 	}
@@ -56,17 +60,35 @@ function removeChapter(chapterkey){
 function handleResponse(response){
 	var responsejson = eval('(' + response + ')');
 	
-	var chaptername = responsejson['chaptername'];
-	var chapterkey = responsejson['chapterkey'];
-	var coords = responsejson['coords'];
-	
-	chaptersDisplayed[chapterkey] = {'quantity' : coords.length };
-	
-	var color = createLegend(chapterkey);
-	var center = createShape(chaptername,chapterkey,coords,color);
-	centerMap(center[0],center[1]);
+	processRequest(responsejson);
 	
 	hideOverlay();
+}
+
+function processRequest(responsejson){
+	var color;
+	var center;
+	
+	var chaptername;
+	var chapterkey;
+	var coords;
+	for( var i = 0; i < responsejson['chapterkeys'].length; i++ ){
+		numChaptersAdded++;
+		
+		chaptername = responsejson['chapternames'][i];
+		chapterkey = responsejson['chapterkeys'][i];
+		coords = responsejson['coords'][i];
+		
+		chaptersDisplayed[chapterkey] = { 'quantity' : coords.length }
+		
+		color = createLegend(chapterkey);
+		center = createShape(chaptername,chapterkey,coords,color);
+		
+		centerMap(center[0],center[1])
+		
+		hideAction('display',chapterkey);
+		showAction('remove',chapterkey);
+	}
 }
 
 function changeStatus(e){

@@ -24,3 +24,8 @@ def deletechapterentry(key):
     chapter = getchapter(key)
     chapter.delete()
     
+def getchapterfromzip(zipcode):
+    query = db.Query(Chapter)
+    query.filter('zips = ', zipcode)
+    return query.run()
+    
