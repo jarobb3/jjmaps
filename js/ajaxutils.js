@@ -2,6 +2,7 @@ function lookup(){
 	var q = document.getElementsByName("lookup")[0].value;
 	showOverlay();
 	downloadUrl('/map', "POST", "q="+q, handleResponse);
+	document.getElementsByName("lookup")[0].value = "";
 }
 
 function showChapter(chapterkey){
@@ -144,4 +145,5 @@ function downloadScript(url) {
 	var script = document.createElement('script');
 	script.src = url;
 	document.body.appendChild(script);
-}
+};
+
