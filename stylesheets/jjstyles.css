@@ -15,6 +15,7 @@ body{
 
 .fl{float:left;}
 .fr{float:right;}
+.cl{clear:left;}
 
 .bold{font-weight:bold;}
 .ital{font-style:italic;}
@@ -27,9 +28,16 @@ body{
 .plm{padding-left:10px;}
 .plb{padding-left:20px;}
 
+.prs{padding-right:5px;}
+.prm{padding-right:10px;}
+.prb{padding-right:20px;}
+
 .mtt{margin-top:2px;}
 .mls{margin-left:5px;}
 .mrs{margin-right:5px;}
+
+.brs{border-right:2px solid #e4e4e4;}
+.brm{border-right:5px solid #e4e4e4;}
 
 .highlight{background-color:#e4e4e4;}
 
@@ -40,10 +48,20 @@ body{
 .blue{color: rgb(43,140,190);}
 .red{color: rgb(228,26,28);}
 
+
 .list{
 	list-style: none;
 	line-height:20px;
 }
+a,a:visited{
+	color: rgb(43,140,190);
+	text-decoration:none;
+	cursor:pointer;
+}
+a:hover{
+	text-decoration:underline;
+}
+
 
 
 .legend{

@@ -3,6 +3,9 @@ import os
 import models
 import helpers
 import json
+import urllib
+import urllib2
+import zipfile
 #import pprint
 
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -215,9 +218,7 @@ class ChaptersCreateAuto(webapp2.RequestHandler):
         
 class Test(webapp2.RequestHandler):
     def get(self):
-        zipcode = '30327'
-        x = models.getchapterfromzip(zipcode)
-        print x
+        pass
         
 app = webapp2.WSGIApplication([
                                ('/', Maps),

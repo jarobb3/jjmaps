@@ -1,6 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <head>
 	<title>JJMaps Project - Add/Edit/Remove Chapters</title>
+	<script type = "text/javascript" src = '../js/visualutils.js'></script>
+	<script type = "text/javascript" src = '../js/ajaxutils.js'></script>
 	<link type = "text/css" rel="stylesheet" href="../stylesheets/jjstyles.css" ></link>
 </head>
 <body>
@@ -41,14 +43,31 @@
 			<a href = "/chapters">Clear</a>
 		</div>
 	</form>
-	<div style = "clear:left;">
+	<div class = "cl">
+		<ul class = "list fl fullw pls">
+			<li class = "fl prm mrs brs">All</li>		
+			{% for region in regions %}
+			<a class = "fl"><li class = "fl prm mrs brs">{{region.name}}</li></a>
+			{% endfor %}
+			<a class = "fl" onclick = "showAddRegionForm()"><li class = "fl prm mrs">+Add a region</li></a>
+		</ul>
+		<div class = "hidden" id = "add-region-form">
+			<form action = "/regions/create">
+				<span>Name of region: </span>
+				<input type = "text" name = "regionname" size = 20 />
+				<input type = "submit" value = "Add Region" />
+				<a class = "" onclick = "hideAddRegionForm()">Cancel</a>
+			</form>
+		</div>
+		
+		
 		{% regroup chapters|dictsort:"state" by state as states %}
 		<ul class = "list plm">
 		{% for state in states %}
 			<li><span class = "bold">{{state.grouper}}</span>
 				<ul class = "list plb">
 					{% for chap in state.list %}
-					<li class = >
+					<li>
 						<span class = 'fl {% if chapter.key == chap.key %}bold highlight ital{% endif %}' style = "width:200px;">{{chap.name}}</span>
 						<a class = 'plm' href = "/map?chapterkey={{chap.key}}">Show on Map</a>
 						<a class = 'plm' href = "/chapters?chapterkey={{chap.key}}">Edit</a>

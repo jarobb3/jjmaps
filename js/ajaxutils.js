@@ -5,6 +5,16 @@ function lookup(){
 	document.getElementsByName("lookup")[0].value = "";
 }
 
+function showAddRegionForm(){
+	var elem = document.getElementById('add-region-form");
+	removeClass(elem, 'hidden');
+}
+
+function hideAddRegionForm(){
+	var elem = document.getElementById('add-region-form");
+	addClass(elem, 'hidden');
+}
+
 function showChapter(chapterkey){
 	//if we've already added the chapter to the map and it's just hidden
 	var starti = 0;
