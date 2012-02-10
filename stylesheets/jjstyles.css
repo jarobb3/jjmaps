@@ -33,8 +33,10 @@ body{
 .prb{padding-right:20px;}
 
 .mtt{margin-top:3px;}
+.mtb{margin-top:20px;}
 .mls{margin-left:5px;}
 .mrs{margin-right:5px;}
+.mbs{margin-bottom:5px;}
 
 .brs{border-right:2px solid #e4e4e4;}
 .brm{border-right:5px solid #e4e4e4;}

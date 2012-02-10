@@ -83,6 +83,23 @@ class Maps(webapp2.RequestHandler):
                 c.append(map(' '.join,coords))
         
         return c
+    
+class MapsChangeTab(webapp2.RequestHandler):
+    def get(self):
+        pass
+    
+    def post(self):
+        tab = self.request.get('tabindex')
+        
+        if tab == 'chapters':
+            chapters = models.getallchapters()
+            response_values = { 'tab' : 'chapters', 'chapters' : chapters }
+        else: #regions tab selected
+            regions = models.getallregions()
+            response_values = { 'tab' : 'regions', 'regions' : regions }
+        
+        self.response.out.write( json.dumps(response_values) )
+        
 
 class RegionsUpdate(webapp2.RequestHandler):
     def get(self):
@@ -207,7 +224,11 @@ class ChaptersUpdate(webapp2.RequestHandler):
         if self.request.get('chapterkey'):
             chapter = models.getchapter(self.request.get('chapterkey'))
         else:
-            chapter = models.Chapter()
+            region = models.getregionfromstate(self.request.get('chapterstate').upper())
+            if region:
+                chapter = models.Chapter(parent=region.key())
+            else:
+                chapter = models.Chapter()
         
         zips = self.request.get('chapterzips')
         counties = self.request.get('chaptercounties')
@@ -315,13 +336,12 @@ class ChaptersCreateAuto(webapp2.RequestHandler):
         
 class Test(webapp2.RequestHandler):
     def get(self):
-        states = models.getallstates()
-        for state in states:
-            print state.to_xml()
+        print models.getregionfromstate('AL').key()
         
 app = webapp2.WSGIApplication([
                                ('/', Maps),
                                ('/map', Maps),
+                               ('/map/change-tab', MapsChangeTab),
                                ('/chapters', Chapters),
                                ('/chapters/update',ChaptersUpdate),
                                ('/chapters/create/auto', ChaptersCreateAuto),

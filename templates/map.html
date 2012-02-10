@@ -29,15 +29,22 @@
 	<div class = "container">
 		<div class = "fixed" style = "background-color:white;width:900px;top:0px;left:0px;margin:2px 5px 0 5px;">
 			<div class = "fl">
+				
+				<ul class = "list fl fullw mbs mtt pls" style = "line-height:30px;">
+					<li class = "fl prm mrs brs hidden"><a onclick="changeMapTab(0)">Chapters</a></li>
+					<li class = "fl prm mrs hidden">Regions</li>
+					<li class = "fl prm mrs">
+						Search for a zip: <input type = "text" name = "lookup"></input>
+						<a class = "mls" onclick = "lookup()"><button>Search</button></a>
+					</li>
+				</ul>
+			</div>
+			<div class = "fr" style = "line-height:35px;">
 				<a href = "/chapters">Add/Edit Chapters</a>
 				<a class = "mls" href = "/map">Clear Map</a>
 			</div>
-			<div class = "fr">
-				Search for a zip: <input type = "text" name = "lookup"></input>
-				<a class = "mls" onclick = "lookup()"><button>Search</button></a>
-			</div>
 		</div>
-		<div class = "fl" style = "width:280px">
+		<div class = "fl mtb" style = "width:280px">
 			{% regroup chapters|dictsort:"state" by state as states %}
 			
 			<ul class = "list plm">

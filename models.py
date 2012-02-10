@@ -23,18 +23,6 @@ def numchaptersinregion(regionkey):
     query.ancestor(regionkey)
     
     return query.count()
-
-class State(db.Model):
-    code = db.StringProperty()
-    region = db.ReferenceProperty(Region)
-    
-def getallstates():
-    return State.all()
-
-def getstatebycode(statecode):
-    query = db.Query(State)
-    query.filter('code = ', statecode)
-    return query.get()
     
 class Chapter(db.Model):
     name = db.StringProperty()
@@ -69,4 +57,11 @@ def getchaptersinstate(statecode):
     query = db.Query(Chapter)
     query.filter('state = ', statecode)
     return query.run()
+    
+    
+def getregionfromstate(statecode):
+    query = db.Query(Chapter)
+    query.filter('state = ', statecode)
+    chapterinstate = query.get()
+    return chapterinstate.parent()
     

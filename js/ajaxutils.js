@@ -88,6 +88,14 @@ function handleResponse(response){
 	hideOverlay();
 }
 
+function changeMapTab(tab){
+	downloadUrl('/map/change-tab',"POST","tab="+tab,handleChangeTabResponse);
+}
+
+function handleChangeTabResponse(response){
+	var responsejson = eval('(' + response + ')');
+}
+
 function processRequest(responsejson){
 	var color;
 	var center;

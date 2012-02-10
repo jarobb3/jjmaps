@@ -46,9 +46,15 @@
 	<div class = "cl">
 		<ul class = "list fl fullw pls" style = "height:25px;">
 			{% if selectedtab == "all" %}
-				<li class = "bold fl prm mrs brs mtt">All</li>
+				<li class = "bold fl prm mrs brs mtt"><span style = "font-weight:normal">[ </span>All</li>
 			{% else %}
-				<a href = "/chapters"><li class = "fl prm mrs brs mtt">All</li></a>
+				<li class = "fl prm mrs brs mtt">[ <a href = "/chapters">All</a></li>
+			{% endif %}
+			
+			{% if selectedtab == "unassigned" %}
+				<li class = "bold fl prm mrs mtt">Unassigned <span style = "font-weight:normal">]</span></li>
+			{% else %}
+				<li class = "fl prm mrs mtt"><a href = "/chapters?regionkey=unassigned">Unassigned </a>]</li>
 			{% endif %}
 			
 			{% for region in regions %}
@@ -58,12 +64,6 @@
 					<a href = "/chapters?regionkey={{region.key}}"><li class = "fl prm mrs brs mtt">{{region.name}}</li></a>
 				{% endif %}
 			{% endfor %}
-			
-			{% if selectedtab == "unassigned" %}
-				<li class = "bold fl prm mrs brs mtt">Unassigned</li>
-			{% else %}
-				<a href = "/chapters?regionkey=unassigned"><li class = "fl prm mrs brs mtt">Unassigned</li></a>
-			{% endif %}
 			
 			<a class = "fl mtt" onclick = "showCreateRegionForm()" id = "create-region-link"><li class = "fl prm mrs">+Add a region</li></a>
 			<li class = "hidden fl" id = "create-region-form">
