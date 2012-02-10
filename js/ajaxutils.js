@@ -10,6 +10,7 @@ function addToRegion(sel){
 	var statecode = sel.options[sel.selectedIndex].value.split(",")[1];
 	
 	downloadUrl('/regions/add-state', "POST", "regionkey="+regionkey+"&statecode="+statecode, regionResponse);
+	showOverlay()
 }
 
 function removeFromRegion(sel){
@@ -17,12 +18,15 @@ function removeFromRegion(sel){
 	regionkey = sel.regionkey;
 	
 	downloadUrl('/regions/remove-state', "POST", "regionkey"+regionkey+"&statecode="+statecode, regionResponse);
+	showOverlay()
 }
 
 function regionResponse(response){
 	var responsejson = eval('(' + response + ')');
 	
 	var redirecturl = '/chapters?regionkey='+responsejson['regionkey'];
+	
+	hideOverlay()
 	window.location = redirecturl;
 }
 
