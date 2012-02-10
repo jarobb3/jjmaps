@@ -44,33 +44,60 @@
 		</div>
 	</form>
 	<div class = "cl">
-		<ul class = "list fl fullw pls">
-			<li class = "fl prm mrs brs">All</li>		
+		<ul class = "list fl fullw pls" style = "height:25px;">
+			{% if selectedtab == "all" %}
+				<li class = "bold fl prm mrs brs mtt">All</li>
+			{% else %}
+				<a href = "/chapters"><li class = "fl prm mrs brs mtt">All</li></a>
+			{% endif %}
+			
 			{% for region in regions %}
-			<a class = "fl"><li class = "fl prm mrs brs">{{region.name}}</li></a>
+				{% if region.key == regionobj.key %}
+					<li class = "bold fl prm mrs brs mtt">{{region.name}}</li>
+				{% else %}
+					<a href = "/chapters?regionkey={{region.key}}"><li class = "fl prm mrs brs mtt">{{region.name}}</li></a>
+				{% endif %}
 			{% endfor %}
-			<a class = "fl" onclick = "showAddRegionForm()"><li class = "fl prm mrs">+Add a region</li></a>
+			
+			{% if selectedtab == "unassigned" %}
+				<li class = "bold fl prm mrs brs mtt">Unassigned</li>
+			{% else %}
+				<a href = "/chapters?regionkey=unassigned"><li class = "fl prm mrs brs mtt">Unassigned</li></a>
+			{% endif %}
+			
+			<a class = "fl mtt" onclick = "showCreateRegionForm()" id = "create-region-link"><li class = "fl prm mrs">+Add a region</li></a>
+			<li class = "hidden fl" id = "create-region-form">
+				<form action = "/regions/create" method = "post">
+					<span>Name of region: </span>
+					<input type = "text" name = "regionname" size = 20 />
+					<input type = "submit" value = "Add Region" />
+					<a class = "" onclick = "hideCreateRegionForm()">Cancel</a>
+				</form>
+			</li>
 		</ul>
-		<div class = "hidden" id = "add-region-form">
-			<form action = "/regions/create">
-				<span>Name of region: </span>
-				<input type = "text" name = "regionname" size = 20 />
-				<input type = "submit" value = "Add Region" />
-				<a class = "" onclick = "hideAddRegionForm()">Cancel</a>
-			</form>
-		</div>
 		
 		
 		{% regroup chapters|dictsort:"state" by state as states %}
 		<ul class = "list plm">
 		{% for state in states %}
-			<li><span class = "bold">{{state.grouper}}</span>
+			<li><span class = "bold">{{state.grouper}} - </span>
+				{% if selectedtab == "unassigned" %}
+				<span id = "{{state.grouper}}-add-region-link"><a onclick = "showAddRegionForm('{{state.grouper}}')">Add to a Region</a></span>
+				{% endif %}
+				<select onchange = "addToRegion(this)" class = "hidden" id = "{{state.grouper}}-add-region-form">
+					<option value = "">Select a region...</option>
+					{% for region in regions %}
+						<option value = "{{region.key}},{{state.grouper}}">{{ region.name }}</option>
+					{% endfor %}
+				</select>
+			
+			
 				<ul class = "list plb">
 					{% for chap in state.list %}
 					<li>
 						<span class = 'fl {% if chapter.key == chap.key %}bold highlight ital{% endif %}' style = "width:200px;">{{chap.name}}</span>
 						<a class = 'plm' href = "/map?chapterkey={{chap.key}}">Show on Map</a>
-						<a class = 'plm' href = "/chapters?chapterkey={{chap.key}}">Edit</a>
+						<a class = 'plm' href = "/chapters?chapterkey={{chap.key}}&regionkey={{selectedtab}}">Edit</a>
 						<a class = 'plm' href = "/chapters/delete?chapterkey={{chap.key}}">Delete</a>
 					</li>
 					{% endfor %}

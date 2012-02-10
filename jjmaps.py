@@ -3,9 +3,6 @@ import os
 import models
 import helpers
 import json
-import urllib
-import urllib2
-import zipfile
 #import pprint
 
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -86,18 +83,109 @@ class Maps(webapp2.RequestHandler):
                 c.append(map(' '.join,coords))
         
         return c
+
+class RegionsUpdate(webapp2.RequestHandler):
+    def get(self):
+        pass
+    
+    def post(self):
+        regionname = self.request.get('regionname')
+        region = models.Region()
+        
+        region.name = regionname
+        region.put()
+        
+        self.redirect('/chapters')
+        
+'''
+RegionsAddState: Adds a state to a region
+'''
+class RegionsAddState(webapp2.RequestHandler):
+    def get(self):
+        pass
+            
+    
+    def post(self):
+        regionkey = self.request.get('regionkey')
+        statecode = self.request.get('statecode')
+        
+        #get Region from db
+        region = models.getregion(regionkey)
+        #print region.to_xml()
+        
+        #get all chapters in the state
+        
+        chapters = models.getchaptersinstate(statecode)
+        for chapter in chapters:
+            newchapter = models.Chapter(parent=region.key())
+            newchapter.name = chapter.name
+            newchapter.state = chapter.state
+            newchapter.zips = chapter.zips
+            newchapter.zipinds = chapter.zipinds
+            newchapter.counties = chapter.counties
+            newchapter.countyinds = chapter.countyinds
+            
+            newchapter.put()
+            models.deletechapterentry(chapter.key())
+        
+        #self.redirect('/chapters')
+        self.response.out.write( json.dumps({ 'regionkey' : regionkey }) )
+       
         
 class Chapters(webapp2.RequestHandler):
     def get(self):
-        chapters = models.getallchapters()
+        regions = models.getallregions()
+        template_values = {}
+        #add regions to the payload
+        template_values['regions'] = regions
         
-        if self.request.get('chapterkey'):
+        if self.request.get('chapterkey'): #if we've selected a specific chapter
             chapterkey = self.request.get('chapterkey')
             chapter = models.getchapter(chapterkey)
-            template_values = { 'chapter' : chapter, 'chapters' : chapters }
-        else:
-            template_values = { 'chapters' : chapters }
+            template_values['chapter'] = chapter #add the chapter to the payload
         
+        #if a region has been selected
+        if self.request.get('regionkey'):
+            regionkey = self.request.get('regionkey')
+            
+            if regionkey == 'unassigned': #if we selected the unassigned category
+                selectedtab = 'unassigned'
+                template_values['selectedtab'] = selectedtab
+                
+                chapters = models.getallchapters()
+                chaptersworegion = []
+                for chapter in chapters:
+                    if not chapter.parent():
+                        chaptersworegion.append(chapter)
+                        #print chapter.name
+                        #print chapter.parent().name
+                        #print chapter.parent()
+                    #print chapter.to_xml()
+                #return
+                chapters = chaptersworegion
+            else: #if we've selected a region
+                region = models.getregion(regionkey)
+                
+                chapters = models.getchaptersinregion(region)
+                
+                template_values['regionobj'] = region
+             
+            #template_values = { 'selectedtab' : region, 'chapters' : chapters, 'regions' : regions }
+        else: #if we selected all
+            chapters = models.getallchapters()
+            selectedtab = "all"
+            template_values['selectedtab'] = selectedtab
+        
+            #check to see if we're highlighting a particular chapter
+            #else:
+            #template_values = { 'chapters' : chapters, 'regions' : regions }
+        
+        template_values['chapters'] = chapters
+        #for c in chapters:
+        #    print c.state
+        #return 
+        #print template_values.keys()
+        #print template_values.values() 
         path = os.path.join(os.path.dirname(__file__), 'templates/chapters.html')
         self.response.out.write(template.render(path, template_values))
         
@@ -218,7 +306,9 @@ class ChaptersCreateAuto(webapp2.RequestHandler):
         
 class Test(webapp2.RequestHandler):
     def get(self):
-        pass
+        states = models.getallstates()
+        for state in states:
+            print state.to_xml()
         
 app = webapp2.WSGIApplication([
                                ('/', Maps),
@@ -228,6 +318,8 @@ app = webapp2.WSGIApplication([
                                ('/chapters/create/auto', ChaptersCreateAuto),
                                ('/chapters/clear', ChaptersClear),
                                ('/chapters/delete', ChaptersDelete),
+                               ('/regions/create', RegionsUpdate),
+                               ('/regions/add-state', RegionsAddState),
                                ('/test', Test)]
                               ,debug=True)
 

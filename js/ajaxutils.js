@@ -5,14 +5,20 @@ function lookup(){
 	document.getElementsByName("lookup")[0].value = "";
 }
 
-function showAddRegionForm(){
-	var elem = document.getElementById('add-region-form");
-	removeClass(elem, 'hidden');
+function addToRegion(sel){
+	var regionkey = sel.options[sel.selectedIndex].value.split(",")[0];
+	var statecode = sel.options[sel.selectedIndex].value.split(",")[1];
+	
+	//just hit the URL with a page refresh
+	//alert(regionkey);
+	downloadUrl('/regions/add-state', "POST", "regionkey="+regionkey+"&statecode="+statecode, stateAddedToRegion);
 }
 
-function hideAddRegionForm(){
-	var elem = document.getElementById('add-region-form");
-	addClass(elem, 'hidden');
+function stateAddedToRegion(response){
+	var responsejson = eval('(' + response + ')');
+	
+	var redirecturl = '/chapters?regionkey='+responsejson['regionkey'];
+	window.location = redirecturl;
 }
 
 function showChapter(chapterkey){

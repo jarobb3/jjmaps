@@ -1,3 +1,33 @@
+function showDiv(divname){
+	var elem = document.getElementById(divname);
+	removeClass(elem, 'hidden');
+}
+
+function hideDiv(divname){
+	var elem = document.getElementById(divname);
+	addClass(elem, 'hidden')
+}
+
+function showCreateRegionForm(){
+	showDiv('create-region-form');
+	hideDiv('create-region-link');
+}
+
+function hideCreateRegionForm(){
+	hideDiv('create-region-form');
+	showDiv('create-region-link');
+}
+
+function showAddRegionForm(state){
+	showDiv(state+'-add-region-form');
+	hideDiv(state+'-add-region-link');
+}
+
+function hideAddRegionForm(state){
+	hideDiv(state+'-add-region-form');
+	showDiv(state+'-add-region-link');
+}
+
 function addClass(elem,className){
 	elem.className += " "+className;
 }

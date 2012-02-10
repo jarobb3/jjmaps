@@ -1,4 +1,37 @@
 from google.appengine.ext import db
+
+class Region(db.Model):
+    name = db.StringProperty()
+    
+def getallregions():
+    return Region.all()
+
+def getregion(key):
+    return db.get(key)
+
+def getchaptersinregion(regionkey):
+    query = db.Query(Chapter)
+    query.ancestor(regionkey)
+    
+    return query.run()
+
+def numchaptersinregion(regionkey):
+    query = db.Query(Chapter)
+    query.ancestor(regionkey)
+    
+    return query.count()
+
+class State(db.Model):
+    code = db.StringProperty()
+    region = db.ReferenceProperty(Region)
+    
+def getallstates():
+    return State.all()
+
+def getstatebycode(statecode):
+    query = db.Query(State)
+    query.filter('code = ', statecode)
+    return query.get()
     
 class Chapter(db.Model):
     name = db.StringProperty()
@@ -27,5 +60,10 @@ def deletechapterentry(key):
 def getchapterfromzip(zipcode):
     query = db.Query(Chapter)
     query.filter('zips = ', zipcode)
+    return query.run()
+
+def getchaptersinstate(statecode):
+    query = db.Query(Chapter)
+    query.filter('state = ', statecode)
     return query.run()
     
