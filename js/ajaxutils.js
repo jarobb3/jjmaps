@@ -17,7 +17,7 @@ function removeFromRegion(sel){
 	statecode = sel.state;
 	regionkey = sel.regionkey;
 	
-	downloadUrl('/regions/remove-state', "POST", "regionkey"+regionkey+"&statecode="+statecode, regionResponse);
+	downloadUrl('/regions/remove-state', "POST", "regionkey="+regionkey+"&statecode="+statecode, regionResponse);
 	showOverlay()
 }
 
@@ -52,9 +52,6 @@ function showChapter(chapterkey){
 	//if we haven't added the chapter to the map, we need to fetch from database
 	else{
 		showOverlay();
-		
-		//hideAction('display',chapterkey);
-		//showAction('remove',chapterkey);
 		
 		downloadUrl('/map',"POST","chapterkey="+chapterkey,handleResponse);
 	}

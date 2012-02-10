@@ -1,7 +1,7 @@
 from google.appengine.ext import db
 
-def keyfromstr(str):
-    return db.Key(encoded=str)
+def keyfromstr(keystr):
+    return db.Key(encoded=keystr)
 
 class Region(db.Model):
     name = db.StringProperty()
