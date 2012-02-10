@@ -9,12 +9,17 @@ function addToRegion(sel){
 	var regionkey = sel.options[sel.selectedIndex].value.split(",")[0];
 	var statecode = sel.options[sel.selectedIndex].value.split(",")[1];
 	
-	//just hit the URL with a page refresh
-	//alert(regionkey);
-	downloadUrl('/regions/add-state', "POST", "regionkey="+regionkey+"&statecode="+statecode, stateAddedToRegion);
+	downloadUrl('/regions/add-state', "POST", "regionkey="+regionkey+"&statecode="+statecode, regionResponse);
 }
 
-function stateAddedToRegion(response){
+function removeFromRegion(sel){
+	statecode = sel.state;
+	regionkey = sel.regionkey;
+	
+	downloadUrl('/regions/remove-state', "POST", "regionkey"+regionkey+"&statecode="+statecode, regionResponse);
+}
+
+function regionResponse(response){
 	var responsejson = eval('(' + response + ')');
 	
 	var redirecturl = '/chapters?regionkey='+responsejson['regionkey'];

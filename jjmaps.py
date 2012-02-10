@@ -109,15 +109,9 @@ class RegionsAddState(webapp2.RequestHandler):
         regionkey = self.request.get('regionkey')
         statecode = self.request.get('statecode')
         
-        #get Region from db
-        region = models.getregion(regionkey)
-        #print region.to_xml()
-        
-        #get all chapters in the state
-        
         chapters = models.getchaptersinstate(statecode)
         for chapter in chapters:
-            newchapter = models.Chapter(parent=region.key())
+            newchapter = models.Chapter(parent=models.keyfromstr(regionkey))
             newchapter.name = chapter.name
             newchapter.state = chapter.state
             newchapter.zips = chapter.zips
@@ -130,6 +124,33 @@ class RegionsAddState(webapp2.RequestHandler):
         
         #self.redirect('/chapters')
         self.response.out.write( json.dumps({ 'regionkey' : regionkey }) )
+        
+'''
+RegionsRemoveState: Removes a state from a region
+'''
+class RegionsRemoveState(webapp2.RequestHandler):
+    def get(self):
+        pass
+    
+    def post(self):
+        regionkey = self.request.get('regionkey')
+        statecode = self.request.get('statecode')
+        
+        chapters = models.getchaptersinstate(statecode)
+        for chapter in chapters:
+            newchapter = models.Chapter()
+            newchapter.name = chapter.name
+            newchapter.state = chapter.state
+            newchapter.zips = chapter.zips
+            newchapter.zipinds = chapter.zipinds
+            newchapter.counties = chapter.counties
+            newchapter.countyinds = chapter.countyinds
+            
+            newchapter.put()
+            models.deletechapterentry(chapter.key())
+            
+        self.response.out.write( json.dumps({ 'regionkey' : regionkey }) )
+            
        
         
 class Chapters(webapp2.RequestHandler):
@@ -157,11 +178,7 @@ class Chapters(webapp2.RequestHandler):
                 for chapter in chapters:
                     if not chapter.parent():
                         chaptersworegion.append(chapter)
-                        #print chapter.name
-                        #print chapter.parent().name
-                        #print chapter.parent()
-                    #print chapter.to_xml()
-                #return
+                        
                 chapters = chaptersworegion
             else: #if we've selected a region
                 region = models.getregion(regionkey)
@@ -176,16 +193,8 @@ class Chapters(webapp2.RequestHandler):
             selectedtab = "all"
             template_values['selectedtab'] = selectedtab
         
-            #check to see if we're highlighting a particular chapter
-            #else:
-            #template_values = { 'chapters' : chapters, 'regions' : regions }
-        
         template_values['chapters'] = chapters
-        #for c in chapters:
-        #    print c.state
-        #return 
-        #print template_values.keys()
-        #print template_values.values() 
+ 
         path = os.path.join(os.path.dirname(__file__), 'templates/chapters.html')
         self.response.out.write(template.render(path, template_values))
         
@@ -320,6 +329,7 @@ app = webapp2.WSGIApplication([
                                ('/chapters/delete', ChaptersDelete),
                                ('/regions/create', RegionsUpdate),
                                ('/regions/add-state', RegionsAddState),
+                               ('/regions/remove-state', RegionsRemoveState),
                                ('/test', Test)]
                               ,debug=True)
 

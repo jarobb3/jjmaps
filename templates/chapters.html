@@ -81,9 +81,13 @@
 		<ul class = "list plm">
 		{% for state in states %}
 			<li><span class = "bold">{{state.grouper}} - </span>
-				{% if selectedtab == "unassigned" %}
-				<span id = "{{state.grouper}}-add-region-link"><a onclick = "showAddRegionForm('{{state.grouper}}')">Add to a Region</a></span>
+				{% if selectedtab == "unassigned" %} <!-- if the unassigned tab, show the add to region link -->
+					<span id = "{{state.grouper}}-add-region-link"><a onclick = "showAddRegionForm('{{state.grouper}}')">Add to a Region</a></span>
 				{% endif %}
+				{% if regionobj %} <!-- if a region has been selected  -->
+					<span><a onclick = "removeFromRegion({'state' : '{{state.grouper}}', 'regionkey' : '{{regionobj.key}}'})">Remove From Region</a></span>
+				{% endif %}
+				
 				<select onchange = "addToRegion(this)" class = "hidden" id = "{{state.grouper}}-add-region-form">
 					<option value = "">Select a region...</option>
 					{% for region in regions %}
