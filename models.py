@@ -62,6 +62,8 @@ def getchaptersinstate(statecode):
 def getregionfromstate(statecode):
     query = db.Query(Chapter)
     query.filter('state = ', statecode)
-    chapterinstate = query.get()
-    return chapterinstate.parent()
+    chapter = query.get()
+    if chapter:
+        return chapter.parent()
+    return None
     

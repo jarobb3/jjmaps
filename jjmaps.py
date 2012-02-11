@@ -336,7 +336,10 @@ class ChaptersCreateAuto(webapp2.RequestHandler):
         
 class Test(webapp2.RequestHandler):
     def get(self):
-        print models.getregionfromstate('AL').key()
+        #print 'got here'
+        print models.getregionfromstate('GA')
+        #print region
+        #print models.getregionfromstate('AL').key()
         
 app = webapp2.WSGIApplication([
                                ('/', Maps),
