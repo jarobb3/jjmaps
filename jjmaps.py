@@ -205,7 +205,7 @@ class Chapters(webapp2.RequestHandler):
             template_values['chapter'] = chapter
         
         regionkey = self.request.get('regionkey')
-        if regionkey == 'all':
+        if regionkey == 'all' or regionkey == '':
             template_values['selectedtab'] = 'all'
             chapters = self.allchapters()
         elif regionkey == 'unassigned':

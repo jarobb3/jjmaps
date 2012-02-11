@@ -36,7 +36,9 @@ function showRegion(regionkey){
 	downloadUrl('/map', 'POST', 'regionkey='+regionkey, addRegionsToMap);
 
 	hideAction('display',regionkey);
-	showAction('remove',regionkey);
+	//showAction('remove',regionkey);
+	
+	//add the "already added to the stack" logic here to make removing stuff work
 }
 
 function addRegionsToMap(response){
@@ -51,17 +53,17 @@ function removeRegion(regionkey){
 
 	hideAction('remove',regionkey);
 	showAction('display',regionkey);
-	
-	//get a list of chapter keys for the region, call back to removeRegionsFromMap
 }
 
 function removeRegionsFromMap(response){
 	var responsejson = eval('(' + response + ')');
 	chapterkeys = responsejson.chapterkeys;
 	
-	for( chapterkey in chapterkeys ){
-		findAndRemoveShapes(chapterkey);
+	for( var i in chapterkeys ){
+		findAndRemoveShapes(chapterkeys[i]);
 	}
+	
+	hideOverlay();
 }
 
 function showChapter(chapterkey){
@@ -110,20 +112,8 @@ function findAndRemoveShapes(chapterkey){
 
 function removeChapter(chapterkey){
 	showOverlay();
-	//findAndRemoveshapes(chapterkey);
-
-	var starti = 0;
-	var q = 0;
-	for( var k in chaptersDisplayed ){
-		q = chaptersDisplayed[k]['quantity'];
-		if( chapterkey == k ){
-			hideShapes(starti,starti+q);
-			break;
-		}
-		
-		starti += q;
-	}	
-
+	findAndRemoveShapes(chapterkey);
+	
 	hideAction('remove',chapterkey);
 	showAction('display',chapterkey);
 	hideLegend(chapterkey);
