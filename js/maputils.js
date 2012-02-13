@@ -13,8 +13,8 @@ function GetMap() {
 			});
 }
 
-function createShape(chaptername, chapterkey, coords, color){	
-	//var color = getColor().split(',');
+function createShape(chaptername, chapterkey, coords, color){
+	var starti = map.entities.getLength();
 	var options = {
 			fillColor: new Microsoft.Maps.Color(parseInt(color[0]),parseInt(color[1]),parseInt(color[2]),parseInt(color[3])),
 			strokeColor: new Microsoft.Maps.Color(100,255,255,255),
@@ -32,7 +32,9 @@ function createShape(chaptername, chapterkey, coords, color){
 		map.entities.push(polygon);
 	}
 	
-	return [c[1],c[0]];
+	var endi = map.entities.getLength();
+	
+	return { 'center' : [c[1],c[0]], 'start' : starti, 'end' : endi };
 }
 
 function centerMap(xcoord,ycoord){

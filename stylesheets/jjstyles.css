@@ -64,6 +64,14 @@ a:hover{
 	text-decoration:underline;
 }
 
+a.selected:hover{
+	text-decoration:none;
+}
+.selected{
+	color: black;
+	font-weight:bold;
+	cursor:default;
+}
 
 
 .legend{
@@ -101,4 +109,12 @@ a:hover{
 .label{
 	line-height:24px;
 	width:150px;
+}
+
+.tab{
+	font-weight: bold;
+	float: left;
+	padding: 0 10px;
+	font-size:14px;
+	line-height:30px;
 }

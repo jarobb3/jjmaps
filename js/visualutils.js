@@ -17,16 +17,16 @@ function hideCreateRegionForm(){
 	hideDiv('create-region-form');
 	showDiv('create-region-link');
 }
-
+/*
 function showAddRegionForm(state){
 	showDiv(state+'-add-region-form');
 	hideDiv(state+'-add-region-link');
 }
-
 function hideAddRegionForm(state){
 	hideDiv(state+'-add-region-form');
 	showDiv(state+'-add-region-link');
 }
+*/
 
 function addClass(elem,className){
 	elem.className += " "+className;
@@ -48,6 +48,7 @@ function hideOverlay(){
 }
 
 function getColor(){
+	numChaptersAdded++;
 	transparency = '180';
 	/*colors = [transparency+',141,211,199',
 	          transparency+',190,186,218',
@@ -82,25 +83,24 @@ function getColor(){
 	return color;
 }
 
-function createLegend(chapterkey){
+function createLegend(key){
 	var color = getColor().split(',');
 	
-	var legend = document.getElementById(chapterkey+'-legend');
+	var legend = $('#'+key+'-legend');
 	var rawcolor = color.slice(1).join(',');
-	legend.style.backgroundColor = 'rgb('+rawcolor+')';
-	removeClass(legend,'hidden');
+	
+	legend.css('background-color', 'rgb('+rawcolor+')');
+	legend.show();
 	
 	return color;
 }
 
-function showLegend(chapterkey){
-	var legend = document.getElementById(chapterkey+'-legend');
-	removeClass(legend,'hidden');
+function showLegend(key){
+	$('#'+key+'-legend').show();
 }
 
-function hideLegend(chapterkey){
-	var legend = document.getElementById(chapterkey+'-legend');
-	addClass(legend,'hidden');
+function hideLegend(key){
+	$('#'+key+'-legend').hide();
 }
 
 function showAction(actionname,chapterkey){

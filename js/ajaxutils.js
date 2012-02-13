@@ -1,36 +1,11 @@
-function lookup(){
+/*function lookup(){
 	var q = document.getElementsByName("lookup")[0].value;
 	showOverlay();
 	downloadUrl('/map', "POST", "q="+q, handleResponse);
 	document.getElementsByName("lookup")[0].value = "";
-}
+}*/
 
-function addToRegion(sel){
-	var regionkey = sel.options[sel.selectedIndex].value.split(",")[0];
-	var statecode = sel.options[sel.selectedIndex].value.split(",")[1];
-	
-	downloadUrl('/regions/add-state', "POST", "regionkey="+regionkey+"&statecode="+statecode, regionResponse);
-	showOverlay();
-}
-
-function removeFromRegion(sel){
-	statecode = sel.state;
-	regionkey = sel.regionkey;
-	
-	downloadUrl('/regions/remove-state', "POST", "regionkey="+regionkey+"&statecode="+statecode, regionResponse);
-	showOverlay();
-}
-
-function regionResponse(response){
-	var responsejson = eval('(' + response + ')');
-	
-	var redirecturl = '/chapters?regionkey='+responsejson['regionkey'];
-	
-	hideOverlay();
-	window.location = redirecturl;
-}
-
-function showRegion(regionkey){
+/*function showRegion(regionkey){
 	//go to the server to get a list of chapternames, chapterkeys
 	showOverlay();
 	downloadUrl('/map', 'POST', 'regionkey='+regionkey, addRegionsToMap);
@@ -64,9 +39,9 @@ function removeRegionsFromMap(response){
 	}
 	
 	hideOverlay();
-}
+}*/
 
-function showChapter(chapterkey){
+/*function showChapter(chapterkey){
 	//if we've already added the chapter to the map and it's just hidden
 	var starti = 0;
 	var q = 0;
@@ -94,8 +69,8 @@ function showChapter(chapterkey){
 		
 		downloadUrl('/map',"POST","chapterkey="+chapterkey,addChaptersToMap);
 	}
-}
-
+}*/
+/*
 function findAndRemoveShapes(chapterkey){
 	var starti = 0;
 	var q = 0;
@@ -109,8 +84,8 @@ function findAndRemoveShapes(chapterkey){
 		starti += q;
 	}
 }
-
-function removeChapter(chapterkey){
+*/
+/*function removeChapter(chapterkey){
 	showOverlay();
 	findAndRemoveShapes(chapterkey);
 	
@@ -119,7 +94,7 @@ function removeChapter(chapterkey){
 	hideLegend(chapterkey);
 	
 	hideOverlay();
-}
+}*/
 
 function addChaptersToMap(response){
 	var responsejson = eval('(' + response + ')');
@@ -127,21 +102,6 @@ function addChaptersToMap(response){
 	illustrate(responsejson, true);
 	
 	hideOverlay();
-}
-
-function changeMapTab(tabname){
-	if( tabname == 'chapters'){
-		showDiv('chapters-list');
-		showDiv('show-chapters');
-		hideDiv('regions-list');
-		hideDiv('show-regions');
-	}
-	else{
-		showDiv('regions-list');
-		showDiv('show-regions');
-		hideDiv('chapters-list');
-		hideDiv('show-chapters');
-	}
 }
 
 function illustrate(responsejson, onechapter){
@@ -226,4 +186,3 @@ function downloadScript(url) {
 	script.src = url;
 	document.body.appendChild(script);
 };
-

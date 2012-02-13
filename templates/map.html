@@ -4,9 +4,10 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<script charset="UTF-8" type="text/javascript" src="http://ecn.dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=7.0"></script>
 	<link type = "text/css" rel="stylesheet" href="../stylesheets/jjstyles.css" ></link>
-	<script type = "text/javascript" src = '../js/ajaxutils.js'></script>
 	<script type = "text/javascript" src = '../js/maputils.js'></script>
 	<script type = "text/javascript" src = '../js/visualutils.js'></script>
+	<script type = "text/javascript" src = '../js/map.js'></script>
+	<script type = "text/javascript" src = '../js/jquery.js'></script>
 	<script type = "text/javascript">
 		//needs this global var to keep track of which chapters have been added to the map
 		chaptersDisplayed = {};
@@ -30,13 +31,8 @@
 			<div class = "fl">
 				
 				<ul class = "list fl fullw mbs mtt pls" style = "line-height:30px;" id = "show-chapters">
-					<li class = "fl prm mrs brs bold" style = "width:60px;">Chapters</li>
-					<li class = "fl plm mrs" style = "width:60px;"><a onclick = "changeMapTab('regions')">Regions</a></li>
-				</ul>
-				
-				<ul class = "list fl fullw mbs mtt pls hidden" style = "line-height:30px;" id = "show-regions">
-					<li class = "fl prm mrs brs" style = "width:60px;"><a onclick="changeMapTab('chapters')">Chapters</a></li>
-					<li class = "fl plm mrs bold" style = "width:60px;">Regions</li>
+					<a id = 'chapters-tab' class = "selected" onclick="changeMapTab('chapters')"><li class = "tab brs" style = "width:60px;">Chapters</li></a>
+					<a id = 'regions-tab' onclick = "changeMapTab('regions')"><li class = "tab" style = "width:60px;">Regions</li></a>
 				</ul>
 				
 			</div>
@@ -47,14 +43,14 @@
 				</span>
 				<span class = "fl prm mrs">
 					Search for a zip: <input type = "text" name = "lookup"></input>
-					<a class = "mls" onclick = "lookup()"><button>Search</button></a>
+					<a class = "mls" onclick = "lookupZip()"><button>Search</button></a>
 				</span>
 			</div>
 		</div>
 		<div class = "fl mtb" style = "width:280px">
 			{% regroup chapters|dictsort:"state" by state as states %}
 			
-			<ul class = "list plm" id = "chapters-list">
+			<ul class = "selectionlist list plm" id = "chapters-list">
 			{% for state in states %}
 				<li><span class = "bold">{{state.grouper}}</span>
 					<ul class = "list plb" id = "chapters-list">
@@ -72,7 +68,7 @@
 				</li>
 			{% endfor %}
 			</ul>
-			<ul class = "list pls hidden" id = "regions-list">
+			<ul class = "selectionlist list pls hidden" id = "regions-list">
 				{% for region in regions %}
 					<li>
 						<div class = 'hidden legend fl' id = "{{region.key}}-legend">&nbsp;</div>

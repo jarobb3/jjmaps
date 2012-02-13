@@ -3,70 +3,57 @@
 	<title>JJMaps Project - Add/Edit/Remove Chapters</title>
 	<script type = "text/javascript" src = '../js/visualutils.js'></script>
 	<script type = "text/javascript" src = '../js/ajaxutils.js'></script>
+	<script type = "text/javascript" src = '../js/chapters.js'></script>
+	<script type = "text/javascript" src = '../js/jquery.js'></script>
 	<link type = "text/css" rel="stylesheet" href="../stylesheets/jjstyles.css" ></link>
 </head>
 <body>
 	<h3>
-	{% if chapter %}
-	Update existing chapter{% else %}Create a new chapter
-	{% endif %}
+	<span id = "update-header" class = "hidden">Update existing chapter</span>
+	<span id = "create-header">Create a new chapter</span>
+	
 	</h3>
-	<form action = "/chapters/update" method = "post">
+	<form action = "/chapters/update" method = "post" id = "addeditform">
 		<div class = "fl fullw">
 			<label class = 'label norm fl'>Chapter Name</label> 
-			<input type = "text" name = "chaptername" value = "{{chapter.name}}" />
+			<input type = "text" name = "chaptername" />
 			<span class = 'ital small lhsmall'>i.e. North Suburban Atlanta</span>
 		</div>
 		<div class = "fl fullw">
 			<label class = 'label norm fl'>State (2-letter abbrevs.)</label> 
-			<input type = "text" name = "chapterstate" size=2 value = "{{chapter.state}}" />
+			<input type = "text" name = "chapterstate" size=2 />
 			<span class = 'ital small lhsmall'>i.e. GA</span>
 		</div>
 		<div class = "fl fullw">
 			<label class = 'fl label norm'>Zipcodes in Chapter (leave blank if none) </label>
-			<textarea name = "chapterzips" rows = "5" cols = "30" />{{chapter.zips|join:', '|cut:"Null"}}</textarea>
+			<textarea name = "chapterzips" rows = "5" cols = "30" /></textarea>
 			<span class = 'ital small lhsmall'>i.e. 30068, 30327, 38053|TN</span>
 		</div>
 		<div class = "fl fullw">
 			<label class = 'fl label norm'>Counties in Chapter (leave blank if none) </label>
-			<textarea name = "chaptercounties" rows = "5" cols = "30" />{{chapter.counties|join:', '|cut:"Null"}}</textarea>
+			<textarea name = "chaptercounties" rows = "5" cols = "30" /></textarea>
 			<span class = 'ital small lhsmall'>i.e. Cobb, Fulton, Tunica|MS</span>
 		</div>
 		<div class = "fl fullw">
 			<label class = 'fl label'>&nbsp;</label>
-			{% if chapter %}
-				<input type = "hidden" name = "chapterkey" value = "{{chapter.key}}" />
-				<input type = "submit" value = "Update" />
-			{% else %}
-				<input type = "submit" value = "Create" />
-			{% endif %}
+				<input type = "hidden" name = "chapterkey" />
+				
+				<span id = "update-button" class = "hidden"><input type = "submit" value = "Update" /></span>
+				<span id = "create-button"><input type = "submit" value = "Create" /></span>
+
 			<a href = "/chapters">Clear</a>
 		</div>
 	</form>
 	<div class = "cl">
 		<ul class = "list fl fullw pls" style = "height:25px;">
-			{% if selectedtab == "all" %}
-				<li class = "bold fl prm mrs brs mtt"><span style = "font-weight:normal">[ </span>All</li>
-			{% else %}
-				<li class = "fl prm mrs brs mtt">[ <a href = "/chapters">All</a></li>
-			{% endif %}
-			
-			{% if selectedtab == "unassigned" %}
-				<li class = "bold fl prm mrs mtt">Unassigned <span style = "font-weight:normal">]</span></li>
-			{% else %}
-				<li class = "fl prm mrs mtt"><a href = "/chapters?regionkey=unassigned">Unassigned </a>]</li>
-			{% endif %}
-			
+			<a id = "all-tab" class = "selected" onclick = "changeTabsAndGo('all')"><li class = "tab brs">All</li></a>
+			<a id = "unassigned-tab" onclick = "changeTabsAndGo('unassigned')"><li class = "tab brs">Unassigned</li></a>
 			{% for region in regions %}
-				{% if region.key == regionobj.key %}
-					<li class = "bold fl prm mrs brs mtt">{{region.name}}</li>
-				{% else %}
-					<a href = "/chapters?regionkey={{region.key}}"><li class = "fl prm mrs brs mtt">{{region.name}}</li></a>
-				{% endif %}
+				<a id = "{{region.name}}-tab" onclick = "changeTabsAndGo('{{region.name}}')"><li class = "tab brs">{{region.name}}</li></a>
 			{% endfor %}
 			
-			<a class = "fl mtt" onclick = "showCreateRegionForm()" id = "create-region-link"><li class = "fl prm mrs">+Add a region</li></a>
-			<li class = "hidden fl" id = "create-region-form">
+			<a class = "tab" onclick = "showCreateRegionForm()" id = "create-region-link"><li class = "fl prm mrs">+Add a region</li></a>
+			<li class = "hidden fl tab" id = "create-region-form">
 				<form action = "/regions/create" method = "post">
 					<span>Name of region: </span>
 					<input type = "text" name = "regionname" size = 20 />
@@ -77,38 +64,77 @@
 		</ul>
 		
 		
-		{% regroup chapters|dictsort:"state" by state as states %}
-		<ul class = "list plm">
-		{% for state in states %}
-			<li><span class = "bold">{{state.grouper}} - </span>
-				{% if selectedtab == "unassigned" %} <!-- if the unassigned tab, show the add to region link -->
-					<span id = "{{state.grouper}}-add-region-link"><a onclick = "showAddRegionForm('{{state.grouper}}')">Add to a Region</a></span>
-				{% endif %}
-				{% if regionobj %} <!-- if a region has been selected  -->
-					<span><a onclick = "removeFromRegion({'state' : '{{state.grouper}}', 'regionkey' : '{{regionobj.key}}'})">Remove From Region</a></span>
-				{% endif %}
-				
-				<select onchange = "addToRegion(this)" class = "hidden" id = "{{state.grouper}}-add-region-form">
-					<option value = "">Select a region...</option>
-					{% for region in regions %}
-						<option value = "{{region.key}},{{state.grouper}}">{{ region.name }}</option>
-					{% endfor %}
-				</select>
-			
-			
+		<ul class = "list plm chapterlist"  id = "allchapters-list">
+			{% regroup allchapters|dictsort:"state" by state as states %}
+			{% for state in states %}
+			<li><span class = "bold">{{state.grouper}}</span>
 				<ul class = "list plb">
 					{% for chap in state.list %}
 					<li>
-						<span class = 'fl {% if chapter.key == chap.key %}bold highlight ital{% endif %}' style = "width:200px;">{{chap.name}}</span>
+						<span class = 'fl' style = "width:200px;">{{chap.name}}</span>
 						<a class = 'plm' href = "/map?chapterkey={{chap.key}}">Show on Map</a>
-						<a class = 'plm' href = "/chapters?chapterkey={{chap.key}}&regionkey={{selectedtab}}">Edit</a>
+						<a class = 'plm' onclick = 'loadChapterToEdit("{{chap.key}}")'>Edit</a>
 						<a class = 'plm' href = "/chapters/delete?chapterkey={{chap.key}}">Delete</a>
 					</li>
 					{% endfor %}
 				</ul>
 			</li>
-		{% endfor %}
+			{% endfor %}
 		</ul>
+		
+		<ul id = "unassignedchapters-list" class = "hidden list plm chapterlist">
+			{% regroup unassignedchapters|dictsort:"state" by state as ustates %}
+			{% for ustate in ustates %}
+			<li>
+				<span class = "bold">{{ustate.grouper}} - </span>
+				<span id = "{{ustate.grouper}}-add-region-link"><a onclick = "showAddRegionForm('{{ustate.grouper}}')">Add to a Region</a></span>
+				<span id = "{{ustate.grouper}}-add-region-form"  class = "hidden">
+					<select onchange = "addToRegion(this)">
+						<option value = "">Select a region...</option>
+						{% for region in regions %}
+						<option value = "{{region.key}},{{ustate.grouper}}">{{ region.name }}</option>
+						{% endfor %}
+					</select>
+					<a onclick = "hideAddRegionForm('{{ustate.grouper}}')">Cancel</a>
+				</span>
+				
+				<ul class = "list plb">
+				{% for uchap in ustate.list %}
+					<li>
+						<span class = 'fl' style = "width:200px;">{{uchap.name}}</span>
+						<a class = 'plm' href = "/map?chapterkey={{uchap.key}}">Show on Map</a>
+						<a class = 'plm' onclick = 'loadChapterToEdit("{{uchap.key}}")'>Edit</a>
+						<a class = 'plm' href = "/chapters/delete?chapterkey={{uchap.key}}">Delete</a>
+					</li>
+				{% endfor %}
+				</ul>
+			</li>
+			{% endfor %}
+		</ul>
+		
+		{% for regionname, chapters in chaptersbyregion.items %}
+		<ul id = "{{regionname}}chapters-list" class = "hidden list plm chapterlist">
+			{% regroup chapters|dictsort:"state" by state as rstates %}
+			{% for rstate in rstates %}
+			<li>
+				<span class = "bold">{{rstate.grouper}} - </span>
+
+				<span><a onclick = "removeFromRegion('{{rstate.grouper}}')">Remove From Region</a></span>
+
+				<ul class = "list plb">
+				{% for rchap in rstate.list %}
+					<li>
+						<span class = 'fl' style = "width:200px;">{{rchap.name}}</span>
+						<a class = 'plm' href = "/map?chapterkey={{rchap.key}}">Show on Map</a>
+						<a class = 'plm' onclick = 'loadChapterToEdit("{{rchap.key}}")'>Edit</a>
+						<a class = 'plm' href = "/chapters/delete?chapterkey={{rchap.key}}">Delete</a>
+					</li>
+				{% endfor %}
+				</ul>
+			</li>
+			{% endfor %}
+		</ul>
+		{% endfor %}
 	</div>
 	<div class = 'overlay hidden' id = 'overlay'>
 		<div class = 'spinner'><img src = "/img/loading-spinner.gif" /></div>

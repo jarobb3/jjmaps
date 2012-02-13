@@ -116,3 +116,39 @@ def chapterstojson(dataarr):
         starti = endi+1
         
     return d
+
+'''
+Interface
+'''
+def coordsfromchapterkey(chapter):
+    zipcoordsdata = {}
+    countycoordsdata = {}
+    
+    c = []
+    for county in chapter.countyinds:
+        s = stateforcounty(county,chapter.state)
+        countyind = county.split('|')[0]
+        try:
+            dataarr = countycoordsdata[s]
+            coords = getcoordsfromindex(dataarr, countyind)
+        except KeyError:
+            countycoordsdata[s] = prepcoordsfile('data/' + s + '/county/complex.txt')
+            coords = getcoordsfromindex(countycoordsdata[s], countyind)
+           
+        if coords:
+            c.append(map(' '.join,coords))
+            
+    for zipcode in chapter.zipinds:
+        s = stateforzip(zipcode,chapter.state)
+        zipind = zipcode.split('|')[0]
+        try:
+            dataarr = zipcoordsdata[s]
+            coords = getcoordsfromindex(dataarr, zipind)
+        except KeyError:
+            zipcoordsdata[s] = prepcoordsfile('data/' + s + '/zip/complex.txt')
+            coords = getcoordsfromindex(zipcoordsdata[s], zipind)
+        
+        if coords:
+            c.append(map(' '.join,coords))
+    
+    return c
