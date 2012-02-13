@@ -18,6 +18,15 @@ handlers:
   script: chapters.py
   login: admin
 
-- url: /.*
+- url: /regions.*
+  script: regions.py
+  
+- url: /map.*
+  script: map.py
+  
+- url: /
+  script: map.py
+  
+- url: /test
   script: jjmaps.py
 

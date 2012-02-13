@@ -53,7 +53,6 @@ function revealShapes(startIndex,endIndex){
 
 function hideShapes(startIndex,endIndex){
 	for( var i=endIndex-1; i>=startIndex; i-- ) {
-		//map.entities.removeAt(i);
 		var polygon = map.entities.get(i);
 		polygon.setOptions({visible: false}); 
 	}
