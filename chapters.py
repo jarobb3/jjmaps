@@ -39,7 +39,14 @@ class Chapters(webapp2.RequestHandler):
             #get the chapter list for each region
             
             chs = models.getchaptersinregion(r)
-            regionswchapters[r.name] = models.chapterstodict(chs)
+            chaptersdict = []
+            for c in chs:
+                chapterkey = c.key()
+                chapterdict = models.to_dict(c)
+                chapterdict['key'] = str(chapterkey)
+                chaptersdict.append(chapterdict)
+                
+            regionswchapters[r.name] = chaptersdict
             
         template_values = {
             'regions' : regions,
@@ -193,13 +200,13 @@ class ChaptersChangeTab(webapp2.RequestHandler):
                     chaptersworegion.append(chapter)
             
             chapters = chaptersworegion
-            print 'unassigned'
+            #print 'unassigned'
         elif selectiontype == 'region':
             chapters = models.getchaptersinregion(regionkey)
-            print 'region'
+            #print 'region'
         else:
             chapters = []
-            print 'broken'
+            #print 'broken'
         
         chaptersarr = []
         for ch in chapters:
