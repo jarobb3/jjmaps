@@ -38,7 +38,7 @@ function createShape(chaptername, chapterkey, coords, color){
 }
 
 function centerMap(xcoord,ycoord){
-	map.setView({animate: false, zoom:6, center: new Microsoft.Maps.Location(xcoord,ycoord)});
+	map.setView({animate: false, zoom:7, center: new Microsoft.Maps.Location(xcoord,ycoord)});
 }
 
 function revealShapes(startIndex,endIndex){
