@@ -46,6 +46,7 @@ class Maps(webapp2.RequestHandler):
         self.response.out.write( json.dumps({ 'chapters' : chaptersdict }) )
                 
     def coordsfromchapterkey(self,chapter):
+        domain = 'http://jandj.gldnfleece.com/'
         zipcoordsdata = {}
         countycoordsdata = {}
         
@@ -57,7 +58,7 @@ class Maps(webapp2.RequestHandler):
                 dataarr = countycoordsdata[s]
                 coords = helpers.getcoordsfromindex(dataarr, countyind)
             except KeyError:
-                countycoordsdata[s] = helpers.prepcoordsfile('data/' + s + '/county/complex.txt')
+                countycoordsdata[s] = helpers.prepcoordsfile(domain + 'data/' + s + '/county/complex.txt')
                 coords = helpers.getcoordsfromindex(countycoordsdata[s], countyind)
                
             if coords:
@@ -70,7 +71,7 @@ class Maps(webapp2.RequestHandler):
                 dataarr = zipcoordsdata[s]
                 coords = helpers.getcoordsfromindex(dataarr, zipind)
             except KeyError:
-                zipcoordsdata[s] = helpers.prepcoordsfile('data/' + s + '/zip/complex.txt')
+                zipcoordsdata[s] = helpers.prepcoordsfile(domain + 'data/' + s + '/zip/complex.txt')
                 coords = helpers.getcoordsfromindex(zipcoordsdata[s], zipind)
             
             if coords:

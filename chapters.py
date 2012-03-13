@@ -64,6 +64,8 @@ class ChaptersEdit(webapp2.RedirectHandler):
 class ChaptersUpdate(webapp2.RequestHandler):
     def post(self):
         #query database to see if this entry already exists (query by chaptername and state)
+        domain = 'http://jandj.gldnfleece.com/'
+        
         if self.request.get('chapterkey'):
             chapter = models.getchapter(self.request.get('chapterkey'))
         else:
@@ -95,7 +97,7 @@ class ChaptersUpdate(webapp2.RequestHandler):
                 ind = helpers.findcountyindex(dataarr, countyname)
             except KeyError:
                 #add dataarr to dict of state data arrays
-                countyindexdata[s] = helpers.prepindexfile('data/' + s + '/county/simple.txt')
+                countyindexdata[s] = helpers.prepindexfile(domain + 'data/' + s + '/county/simple.txt')
                 ind = helpers.findcountyindex(countyindexdata[s], countyname)
             
             if not isinstance(ind,str):
@@ -113,7 +115,7 @@ class ChaptersUpdate(webapp2.RequestHandler):
                 dataarr = zipindexdata[s]
                 ind = helpers.findzipindex(dataarr,zipname)
             except KeyError:
-                zipindexdata[s] = helpers.prepindexfile('data/' + s + '/zip/simple.txt')
+                zipindexdata[s] = helpers.prepindexfile(domain + 'data/' + s + '/zip/simple.txt')
                 ind = helpers.findzipindex(zipindexdata[s], zipname)
                 
             if not isinstance(ind,str):
@@ -146,8 +148,9 @@ class ChaptersClear(webapp2.RequestHandler):
 class ChaptersCreateAuto(webapp2.RequestHandler):
     def get(self):
         state = self.request.get('state')
+        domain = 'http://jandj.gldnfleece.com/'
         
-        chaptersdatafile = map(helpers.commakill,helpers.getdatafilearray('data/' + state.upper() + '/chapters.txt'))
+        chaptersdatafile = map(helpers.commakill,helpers.getdatafilearray(domain + 'data/' + state.upper() + '/chapters.txt'))
         chaptersjson = helpers.chapterstojson(chaptersdatafile)
         
         for chaptername in chaptersjson:
@@ -160,7 +163,7 @@ class ChaptersCreateAuto(webapp2.RequestHandler):
             #countyfilepath = 'data/' + state + '/county/simple.txt'
             chapter.counties = chapterjson[0]
             if chapter.counties[0] != 'Null':
-                countydataarr = map(helpers.quotekill,helpers.getdatafilearray('data/' + state + '/county/simple.txt'))
+                countydataarr = map(helpers.quotekill,helpers.getdatafilearray(domain + 'data/' + state + '/county/simple.txt'))
                 chapter.countyinds = helpers.findcountyindicies(countydataarr, chapter.counties)
             else:
                 chapter.countyinds = []
@@ -168,7 +171,7 @@ class ChaptersCreateAuto(webapp2.RequestHandler):
             #zipsfilepath = 'data/' + state + '/zip/simple.txt'
             chapter.zips = chapterjson[1]
             if chapter.zips[0] != 'Null':
-                zipsdataarr = map(helpers.quotekill,helpers.getdatafilearray('data/' + state + '/zip/simple.txt'))
+                zipsdataarr = map(helpers.quotekill,helpers.getdatafilearray(domain + 'data/' + state + '/zip/simple.txt'))
                 chapter.zipinds = helpers.findzipindicies(zipsdataarr, chapter.zips)
             else:
                 chapter.zipinds = []

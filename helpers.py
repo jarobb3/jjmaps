@@ -1,3 +1,6 @@
+import urllib
+domain = 'http://jandj.gldnfleece.com/'
+
 def stateforcounty(county,defaultstate):
     c = county.split("|")
     if len(c) > 1:
@@ -14,8 +17,8 @@ def genindfilenamearr(states):
     countyfilenamearr = []
     zipfilenamearr = [] 
     for s in states:
-        countyfilename = 'data/' + s + '/county/simple.txt'
-        zipfilename = 'data/' + s + '/zip/simple.txt'
+        countyfilename = domain + 'data/' + s + '/county/simple.txt'
+        zipfilename = domain + 'data/' + s + '/zip/simple.txt'
         
         countyfilenamearr.append(countyfilename)
         zipfilenamearr.append(zipfilename)
@@ -73,7 +76,8 @@ def findzipindicies(dataarr,ziplist):
     return inds
 
 def getdatafilearray(filename):
-    f = open(filename)
+    #f = open(filename)
+    f = urllib.urlopen(filename)
     data = f.readlines()
     f.close()
     
@@ -132,7 +136,7 @@ def coordsfromchapterkey(chapter):
             dataarr = countycoordsdata[s]
             coords = getcoordsfromindex(dataarr, countyind)
         except KeyError:
-            countycoordsdata[s] = prepcoordsfile('data/' + s + '/county/complex.txt')
+            countycoordsdata[s] = prepcoordsfile(domain + 'data/' + s + '/county/complex.txt')
             coords = getcoordsfromindex(countycoordsdata[s], countyind)
            
         if coords:
@@ -145,7 +149,7 @@ def coordsfromchapterkey(chapter):
             dataarr = zipcoordsdata[s]
             coords = getcoordsfromindex(dataarr, zipind)
         except KeyError:
-            zipcoordsdata[s] = prepcoordsfile('data/' + s + '/zip/complex.txt')
+            zipcoordsdata[s] = prepcoordsfile(domain + 'data/' + s + '/zip/complex.txt')
             coords = getcoordsfromindex(zipcoordsdata[s], zipind)
         
         if coords:
