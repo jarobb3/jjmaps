@@ -39,7 +39,14 @@ class Chapters(webapp2.RequestHandler):
             #get the chapter list for each region
             
             chs = models.getchaptersinregion(r)
-            regionswchapters[r.name] = models.chapterstodict(chs)
+            chaptersdict = []
+            for c in chs:
+                chapterkey = c.key()
+                chapterdict = models.to_dict(c)
+                chapterdict['key'] = str(chapterkey)
+                chaptersdict.append(chapterdict)
+                
+            regionswchapters[r.name] = chaptersdict
             
         template_values = {
             'regions' : regions,
@@ -108,6 +115,7 @@ class ChaptersUpdate(webapp2.RequestHandler):
             
         zipindexdata = {}
         chapter.zipinds = []
+        ziperrors = []
         for zipcode in chapter.zips:
             s = helpers.stateforzip(zipcode,chapter.state)
             zipname = zipcode.split("|")[0]
@@ -119,19 +127,30 @@ class ChaptersUpdate(webapp2.RequestHandler):
                 ind = helpers.findzipindex(zipindexdata[s], zipname)
                 
             if not isinstance(ind,str):
-                self.response.out.write(self.errorstr(ind))
-                return
-            
-            chapter.zipinds.append(ind+'|'+s)
+                #self.response.out.write(self.errorstr(ind))
+                ziperrors.append(zipcode)
+                #return
+            else:
+                chapter.zipinds.append(ind+'|'+s)
                 
         chapter.put()
         
-        self.redirect('/chapters')
-        
+        if len(ziperrors) == 0:
+            self.redirect('/chapters')
+        else:
+            self.response.out.write(self.errorzips(ziperrors))
+            return
+            
     def errorstr(self,errorobj):
         return """
             Update Error: %s -- %s. Please hit the Back button in your browser and try again. Check your spelling and check the state of the invalid zipcode or county.
         """ % (errorobj['error'],"\""+errorobj['baditem']+"\"")
+        
+    def errorzips(self,errorziplist):
+        return """
+            Your chapter was created/updated, but we couldn't find a few zipcodes in our data files.
+            Here's the list of zipcodes we couldn't find: <br /> %s <br /> <a href='/chapters'>Continue to Admin page</a>
+            """ % ('<br />'.join(errorziplist))
         
 class ChaptersDelete(webapp2.RequestHandler):
     def get(self):
@@ -196,13 +215,13 @@ class ChaptersChangeTab(webapp2.RequestHandler):
                     chaptersworegion.append(chapter)
             
             chapters = chaptersworegion
-            print 'unassigned'
+            #print 'unassigned'
         elif selectiontype == 'region':
             chapters = models.getchaptersinregion(regionkey)
-            print 'region'
+            #print 'region'
         else:
             chapters = []
-            print 'broken'
+            #print 'broken'
         
         chaptersarr = []
         for ch in chapters:
