@@ -10,6 +10,14 @@ body{
 	margin-top:30px;
 }
 
+.attribution{
+	position:absolute;
+	bottom:0;
+	margin-bottom:-20px;
+	font-size:10px;
+	right:0;
+}
+
 .fullw{width:100%;}
 .fullh{height:100%;}
 
