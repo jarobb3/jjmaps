@@ -70,6 +70,20 @@ function hideAddRegionForm(state){
 	$("#"+state+"-add-region-link").show();
 }
 
+/*
+ * Create a region
+ */
+
+function showCreateRegionForm(){
+	$('#create-region-form').show();
+	$('#create-region-link').hide();
+}
+
+function hideCreateRegionForm(){
+	$('#create-region-form').hide();
+	$('#create-region-link').show();
+}
+
 function addToRegion(sel){
 	var regionkey = sel.options[sel.selectedIndex].value.split(",")[0];
 	var statecode = sel.options[sel.selectedIndex].value.split(",")[1];
